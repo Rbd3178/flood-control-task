@@ -22,7 +22,7 @@ func setupControl() FloodControl {
 
 func main() {
 	fc := setupControl()
-	for i := 1; i < 10; i++ {
+	for i := 0; i < 11; i++ {
 		ok, err := fc.Check(context.Background(), 1)
 		if err != nil {
 			fmt.Printf("Check returned an error: %s\n", err)
@@ -35,7 +35,7 @@ func main() {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	
+
 }
 
 // FloodControl интерфейс, который нужно реализовать.

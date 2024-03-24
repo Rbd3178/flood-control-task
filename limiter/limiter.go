@@ -8,36 +8,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Limiter
 type Limiter struct {
 	client   *redis.Client
 	interval int
 	limit    int64
-}
-
-func (l *Limiter) Check(ctx context.Context, userID int64) (bool, error) {
-	key := strconv.Itoa(int(userID))
-	count, err := l.client.Get(ctx, key).Int64()
-	if err != nil && err != redis.Nil {
-		return false, err
-	}
-
-	if count >= l.limit {
-		return false, nil
-	}
-
-	p := l.client.TxPipeline()
-	p.Incr(ctx, key)
-	p.Expire(ctx, key, time.Duration(l.interval)*time.Second)
-	_, err = p.Exec(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	go func() {
-		time.Sleep(time.Duration(l.interval)*time.Second)
-		l.client.Decr(ctx, key)
-	}()
-	return true, nil
 }
 
 // New establishes a connection with a Redis database,
@@ -54,4 +29,34 @@ func New(cfg *Config) *Limiter {
 		interval: cfg.Interval,
 		limit:    cfg.Limit,
 	}
+}
+
+// Check
+func (l *Limiter) Check(ctx context.Context, userID int64) (bool, error) {
+	userIDKey := strconv.Itoa(int(userID))
+	count, err := l.client.Get(ctx, userIDKey).Int64()
+	if err != nil && err != redis.Nil {
+		return false, err
+	}
+
+	if count >= l.limit {
+		return false, nil
+	}
+
+	p := l.client.TxPipeline()
+	p.Incr(ctx, userIDKey)
+	p.Expire(ctx, userIDKey, time.Duration(l.interval)*time.Second)
+	_, err = p.Exec(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	go func() {
+		time.Sleep(time.Duration(l.interval) * time.Second)
+		exists, _ := l.client.Exists(ctx, userIDKey).Result()
+		if exists == 1 {
+			l.client.Decr(ctx, userIDKey)
+		}
+	}()
+	return true, nil
 }
