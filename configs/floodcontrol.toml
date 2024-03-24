@@ -1,0 +1,5 @@
+redisaddr = "localhost:6379"
+redispass = ""
+redsidb = 0
+interval = 5
+limit = 2

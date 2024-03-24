@@ -2,10 +2,40 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/BurntSushi/toml"
+	"github.com/Rbd3178/task/limiter"
 )
 
-func main() {
+func setupControl() FloodControl {
+	config := limiter.NewConfig()
+	_, err := toml.DecodeFile("configs/floodcontrol.toml", config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	return limiter.New(config)
+}
+
+func main() {
+	fc := setupControl()
+	for i := 1; i < 10; i++ {
+		ok, err := fc.Check(context.Background(), 1)
+		if err != nil {
+			fmt.Printf("Check returned an error: %s\n", err)
+			continue
+		}
+		if ok {
+			fmt.Printf("Allowed\n")
+		} else {
+			fmt.Printf("Not allowed\n")
+		}
+		time.Sleep(1 * time.Second)
+	}
+	
 }
 
 // FloodControl интерфейс, который нужно реализовать.
