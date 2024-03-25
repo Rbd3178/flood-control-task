@@ -29,13 +29,16 @@ func main() {
 			break
 		}
 		ok, err := fc.Check(context.Background(), id)
+
 		if err != nil {
-			fmt.Printf("Check returned an error: %s\n", err)
+			fmt.Printf("Check returned an error: %s\n\n", err)
+			continue
 		}
+
 		if ok {
-			fmt.Printf("Allowed\n")
+			fmt.Printf("Allowed\n\n")
 		} else {
-			fmt.Printf("Not allowed\n")
+			fmt.Printf("Not allowed\n\n")
 		}
 	}
 
