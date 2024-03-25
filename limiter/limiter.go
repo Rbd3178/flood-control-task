@@ -53,8 +53,8 @@ func (l *Limiter) Check(ctx context.Context, userID int64) (bool, error) {
 
 	go func() {
 		time.Sleep(time.Duration(l.interval) * time.Second)
-		exists, _ := l.client.Exists(ctx, userIDKey).Result()
-		if exists == 1 {
+		exists, err := l.client.Exists(ctx, userIDKey).Result()
+		if exists == 1 && err == nil {
 			l.client.Decr(ctx, userIDKey)
 		}
 	}()
