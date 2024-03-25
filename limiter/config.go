@@ -2,11 +2,11 @@ package limiter
 
 // Config
 type Config struct {
-	RedisAddr string `toml:"redisaddr"`
-	RedisPass string `toml:"redispass"`
-	RedisDB   int    `toml:"redisdb"`
-	Interval  int    `toml:"interval"`
-	Limit     int64    `toml:"limit"`
+	RedisAddr string `toml:"redisaddr" json:"redisaddr"`
+	RedisPass string `toml:"redispass" json:"redispass"`
+	RedisDB   int    `toml:"redisdb" json:"redisdb"`
+	Interval  int    `toml:"interval" json:"interval"`
+	Limit     int64  `toml:"limit" json:"limit"`
 }
 
 // NewConfig
