@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/Rbd3178/task/limiter"
@@ -22,18 +21,22 @@ func setupControl() FloodControl {
 
 func main() {
 	fc := setupControl()
-	for i := 0; i < 11; i++ {
-		ok, err := fc.Check(context.Background(), 1)
+	var id int64
+	for {
+		fmt.Scanln(&id)
+		if id == -1 {
+			fmt.Printf("Exiting...\n")
+			break
+		}
+		ok, err := fc.Check(context.Background(), id)
 		if err != nil {
 			fmt.Printf("Check returned an error: %s\n", err)
-			continue
 		}
 		if ok {
 			fmt.Printf("Allowed\n")
 		} else {
 			fmt.Printf("Not allowed\n")
 		}
-		time.Sleep(1 * time.Second)
 	}
 
 }
